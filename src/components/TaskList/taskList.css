@@ -1,0 +1,77 @@
+#listContainer{
+    width: 100%;
+}
+
+.listItems{
+    background-color: rgba(0, 0, 0, 0.8);
+        margin: 1rem;
+        padding: 1rem 1.5rem;
+        border-radius: 1rem;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        font-size: large;
+        &>p{
+            text-align: start;
+        }
+        &>div{
+            padding-top: 0.8rem;
+            display: flex;
+            gap: 0.8rem;
+            align-items: center;
+            justify-content: center;
+            font-size: small;
+            &>svg{
+                cursor: pointer;
+            }
+        }
+}
+
+#commentForm{
+    position: absolute;
+    top: 35vh;
+    left: 1rem;
+    background-color: black;
+    padding: 2rem 1rem;
+    display: flex;
+    flex-direction: column;
+    width: calc(100vw - 4rem);
+    gap: 1rem;
+    border-radius: 1rem;
+}
+
+.comments{
+    font-size: small;
+    white-space: pre-wrap;
+    margin: 0;
+}
+
+#commentArea{
+    width: calc(100% - 0.5rem);
+    resize: none;
+}
+
+.date{
+    font-size: 11px;
+    text-decoration: underline;
+    font-weight: bolder;
+    font-style: italic;
+    margin: 0;
+    margin-left: auto;
+    padding: 0.05rem 0.2rem;
+    border-radius: 0.3rem;
+}
+
+.task{
+    margin: 0.3rem;
+    margin-bottom: 0;
+    text-align: start;
+}
+
+.completed{
+ text-decoration: line-through;   
+}
+
+.late{
+    background-color: #972929;
+}

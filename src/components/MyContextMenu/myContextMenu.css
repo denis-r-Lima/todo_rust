@@ -1,0 +1,23 @@
+#menuContainer{
+    position: absolute;
+    background-color: #3f3f3f;
+    border-radius: 0.5rem;
+    width: 170px;
+    min-height: 1rem;
+}
+
+.menuItem{
+    text-align: start;
+    padding: 0rem 0.8rem;
+    margin: 0.2rem;
+    border-radius: 0.5rem;
+    font-size: smaller;
+    cursor: pointer;
+    display: flex;
+    justify-content: start;
+    gap: 0.5rem;
+    align-items: center;
+    &:hover{
+        background-color: rgba(200,200,200,0.15);
+    }
+}
