@@ -24,6 +24,7 @@
 .expanded {
   height: 15rem;
   width: calc(100vw - 2rem);
+  max-width: 30rem;
 }
 
 #addForm{

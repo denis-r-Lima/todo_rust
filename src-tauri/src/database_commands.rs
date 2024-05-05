@@ -66,7 +66,7 @@ pub fn get_tasks(value: i64, state: State<Database>) -> Result<Vec<DatabaseData>
     let query = format!(
         "select * from tasks where completed = 0 or completed > {} order by due_date",
         value - (2592000 * 1000)
-    ); //Get tasks that has been completed on the last 30 days
+    ); //Get tasks that has not been completed or completed on the last 30 days
 
     send_query(query, state)
 }
@@ -92,7 +92,7 @@ pub fn edit_task(
     let mut modifications: Vec<String> = Vec::new();
 
     for n in 0..column.len() {
-        modifications.push(format!("{}={}", column[n], value[n]));
+        modifications.push(format!("{}=\"{}\"", column[n], value[n]));
     }
 
     let query = format!(

@@ -44,7 +44,7 @@ const TaskList: React.FC<Props> = ({ tasks, setTasks }) => {
     try {
       await invoke("edit_task", {
         column,
-        value: value.map((v) => `"${v}"`),
+        value: value.map((v) => `${v}`.replace("\"", "&#02BA;")),
         taskId: tasks[taskIndex].id
       });
       setTasks((prevState) =>
@@ -61,12 +61,15 @@ const TaskList: React.FC<Props> = ({ tasks, setTasks }) => {
               return v;
             }
           })
-          .sort((a, b) => a.due_date - b.due_date)
-          .sort((a, b) =>
-            a.completed === 0 || b.completed == 0
-              ? a.completed - b.completed
-              : b.completed - a.completed
-          )
+          .sort((a,b) => {
+            if (!!!a.completed && !!!b.completed){
+              return  a.due_date - b.due_date
+            }           
+            if (!!!a.completed || !!!b.completed){
+              return  a.completed - b.completed
+            }
+            return b.completed - a.completed
+          })
       );
     } catch (error) {
       console.log(error);
@@ -83,7 +86,7 @@ const TaskList: React.FC<Props> = ({ tasks, setTasks }) => {
         prevState.filter((value) => value.id != tasks[taskIndex].id)
       );
     } catch (error) {
-      console.log("Deu erro");
+      console.log(error);
     }
   };
 

@@ -27,10 +27,14 @@ function App() {
     getTasks();
   }, []);
 
-  // useEffect(() => {
-  //   addEventListener("contextmenu", (e) => e.preventDefault());
-  //   return removeEventListener("contextmenu", (e) => e.preventDefault());
-  // }, []);
+  const isDev = () => {
+    return window.location.host.startsWith("localhost:");
+  };
+
+  useEffect(() => {
+    if (!isDev()) addEventListener("contextmenu", (e) => e.preventDefault());
+    return removeEventListener("contextmenu", (e) => e.preventDefault());
+  }, []);
 
   return (
     <div className="container">
