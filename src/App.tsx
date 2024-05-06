@@ -9,6 +9,7 @@ import WindowDecoration from "./components/WindowDecoration/windowDecoratio";
 
 function App() {
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [search, setSearch] = useState("")
 
   const getTasks = async () => {
     try {
@@ -36,10 +37,20 @@ function App() {
     return removeEventListener("contextmenu", (e) => e.preventDefault());
   }, []);
 
+  const onSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearch(e.currentTarget.value)
+  }
+
   return (
     <div className="container">
       <WindowDecoration />
-      <TaskList tasks={tasks} setTasks={setTasks} />
+      <div id="searchBar">
+        <input type="text" name="search" onChange={onSearchChange} />
+      </div>
+      <TaskList
+        tasks={tasks.filter((value) => value.task.toLowerCase().includes(search.toLowerCase()))}
+        setTasks={setTasks}
+      />
       <AddTask setTasks={setTasks} />
     </div>
   );

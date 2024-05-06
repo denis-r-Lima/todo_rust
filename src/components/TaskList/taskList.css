@@ -38,6 +38,7 @@
     width: calc(100vw - 4rem);
     gap: 1rem;
     border-radius: 1rem;
+    border: 1px solid #f6f6f6;
 }
 
 .comments{
@@ -74,4 +75,16 @@
 
 .late{
     background-color: #972929;
+}
+
+.popUpContainer{
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: rgba(0, 0, 0, 0.8);
+    display: grid;
+    place-items: center;
+    z-index: 10;
 }

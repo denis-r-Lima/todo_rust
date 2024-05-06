@@ -33,6 +33,7 @@ const TaskList: React.FC<Props> = ({ tasks, setTasks }) => {
   const [inputText, setInputText] = useState("");
   const [openComment, setOpenComment] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
+  const [openDelete, setOpenDelete] = useState(false);
   const [taskIndex, setTaskIndex] = useState(0);
   const [menuCoord, setMenuCoord] = useState<{ x: number; y: number }>({
     x: 0,
@@ -44,7 +45,7 @@ const TaskList: React.FC<Props> = ({ tasks, setTasks }) => {
     try {
       await invoke("edit_task", {
         column,
-        value: value.map((v) => `${v}`.replace("\"", "&#02BA;")),
+        value: value.map((v) => `${v}`.replace('"', "&#02BA;")),
         taskId: tasks[taskIndex].id
       });
       setTasks((prevState) =>
@@ -61,14 +62,14 @@ const TaskList: React.FC<Props> = ({ tasks, setTasks }) => {
               return v;
             }
           })
-          .sort((a,b) => {
-            if (!!!a.completed && !!!b.completed){
-              return  a.due_date - b.due_date
-            }           
-            if (!!!a.completed || !!!b.completed){
-              return  a.completed - b.completed
+          .sort((a, b) => {
+            if (!!!a.completed && !!!b.completed) {
+              return a.due_date - b.due_date;
             }
-            return b.completed - a.completed
+            if (!!!a.completed || !!!b.completed) {
+              return a.completed - b.completed;
+            }
+            return b.completed - a.completed;
           })
       );
     } catch (error) {
@@ -85,6 +86,7 @@ const TaskList: React.FC<Props> = ({ tasks, setTasks }) => {
       setTasks((prevState) =>
         prevState.filter((value) => value.id != tasks[taskIndex].id)
       );
+      setOpenDelete(false);
     } catch (error) {
       console.log(error);
     }
@@ -142,6 +144,15 @@ const TaskList: React.FC<Props> = ({ tasks, setTasks }) => {
     return [month, day, year].join("-");
   };
 
+  const closePopUps = (
+    e: React.MouseEvent<HTMLDivElement | HTMLButtonElement>
+  ) => {
+    if (e.target !== e.currentTarget) return;
+    setOpenComment(false);
+    setOpenEdit(false);
+    setOpenDelete(false);
+  };
+
   return (
     <>
       <div id="listContainer">
@@ -170,34 +181,47 @@ const TaskList: React.FC<Props> = ({ tasks, setTasks }) => {
         ))}
       </div>
       {openComment && (
-        <div id="commentForm">
-          <textarea
-            id="commentArea"
-            rows={10}
-            placeholder="Comment"
-            value={inputText}
-            onChange={onChange}
-          />
-          <button onClick={() => edit(["comments"], [inputText])}>
-            Confirm
-          </button>
+        <div className="popUpContainer" onClick={closePopUps}>
+          <div id="commentForm">
+            <textarea
+              id="commentArea"
+              rows={10}
+              placeholder="Comment"
+              value={inputText}
+              onChange={onChange}
+            />
+            <button onClick={() => edit(["comments"], [inputText])}>
+              Confirm
+            </button>
+          </div>
         </div>
       )}
       {openEdit && (
-        <div id="commentForm">
-          <input placeholder="Task" value={inputText} onChange={onChange} />
-          <input
-            type="date"
-            name="Due date"
-            id="due"
-            onChange={onChangeDate}
-            value={new Date(dueDate).toISOString().split("T")[0]}
-          />
-          <button
-            onClick={() => edit(["task", "due_date"], [inputText, dueDate])}
-          >
-            Confirm
-          </button>
+        <div className="popUpContainer" onClick={closePopUps}>
+          <div id="commentForm">
+            <input placeholder="Task" value={inputText} onChange={onChange} />
+            <input
+              type="date"
+              name="Due date"
+              id="due"
+              onChange={onChangeDate}
+              value={new Date(dueDate).toISOString().split("T")[0]}
+            />
+            <button
+              onClick={() => edit(["task", "due_date"], [inputText, dueDate])}
+            >
+              Confirm
+            </button>
+          </div>
+        </div>
+      )}
+      {openDelete && (
+        <div className="popUpContainer" onClick={closePopUps}>
+          <div id="commentForm">
+            <p>Are sure you wnat to delete this task?</p>
+            <button onClick={closePopUps}>Cancel</button>
+            <button onClick={deleteTask}>Confirm</button>
+          </div>
         </div>
       )}
       {!!menuCoord.x && (
@@ -210,7 +234,7 @@ const TaskList: React.FC<Props> = ({ tasks, setTasks }) => {
               !!tasks[taskIndex].completed ? [0] : [Date.now()]
             )
           }
-          deleteTask={deleteTask}
+          setOpenDelete={setOpenDelete}
           openCommentDiv={openCommentDiv}
           openEditDiv={openEditDiv}
           task={tasks[taskIndex]}

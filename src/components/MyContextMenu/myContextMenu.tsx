@@ -12,21 +12,21 @@ import "./myContextMenu.css";
 type Props = {
   top: number;
   left: number;
-  deleteTask: () => void;
   completeTask: () => void;
   openCommentDiv: () => void;
   openEditDiv: () => void;
   runMigration: () => void;
+  setOpenDelete: (value: React.SetStateAction<boolean>) => void
   task: Task;
 };
 
 const MyContextMenu: React.FC<Props> = ({
   top,
   left,
-  deleteTask,
   completeTask,
   openCommentDiv,
   openEditDiv,
+  setOpenDelete,
   // runMigration,
   task
 }) => {
@@ -46,7 +46,7 @@ const MyContextMenu: React.FC<Props> = ({
         <MdModeComment />
         {task.comments === "" ? "Add" : "Edit"} Comment
       </div>
-      <div className="menuItem" onClick={deleteTask}>
+      <div className="menuItem" onClick={() => setOpenDelete(true)}>
         <MdDeleteForever size={16} />
         Delete Task
       </div>

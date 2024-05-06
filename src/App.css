@@ -1,0 +1,17 @@
+#searchBar{
+    margin: 1rem;
+    margin-top: 1.5rem;
+    position: relative;
+    &>input{
+        width:calc(100% - 3rem);
+    }
+}
+
+#searchBar::after{
+    content: "\01F50D";
+    position: absolute;
+    right: 0.5rem;
+    top: 6px;
+    color: black;
+    opacity: 0.5;
+}
