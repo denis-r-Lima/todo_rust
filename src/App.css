@@ -2,15 +2,24 @@
     margin: 1rem;
     margin-top: 1.5rem;
     position: relative;
+    &>span{
+        position: absolute;
+        right: 2.5rem;
+        top: calc(50% - 10px);
+        font-weight: bolder;
+        color: #bb1d12;
+        cursor: pointer;
+    }
     &>input{
-        width:calc(100% - 3rem);
+        width:calc(100% - 5.5rem);
+        padding-right: 3.5rem;
     }
 }
 
 #searchBar::after{
     content: "\01F50D";
     position: absolute;
-    right: 0.5rem;
+    right: 1rem;
     top: 6px;
     color: black;
     opacity: 0.5;

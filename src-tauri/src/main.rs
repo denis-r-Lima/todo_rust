@@ -51,6 +51,7 @@ fn main() {
             database_commands::edit_task,
             database_commands::migration
         ])
+        .plugin(tauri_plugin_window_state::Builder::default().build())
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
