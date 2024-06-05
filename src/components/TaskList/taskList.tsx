@@ -12,10 +12,30 @@ type Props = {
 const TaskList: React.FC<Props> = ({ tasks, setTasks }) => {
   useEffect(() => {
     addEventListener("click", () => {
-      setMenuCoord({ x: 0, y: 0 });
+      if (!!!menuCoord.x) {
+        setMenuCoord({ x: 0, y: 0 });
+      }
     });
+
     return removeEventListener("click", () => {
-      setMenuCoord({ x: 0, y: 0 });
+      if (!!!menuCoord.x) {
+        setMenuCoord({ x: 0, y: 0 });
+      }
+    });
+  }, []);
+
+  useEffect(() => {
+    const container = document.getElementsByClassName("container");
+    if (container.length === 0) return;
+    container[0].addEventListener("scroll", () => {
+      if (!!!menuCoord.x) {
+        setMenuCoord({ x: 0, y: 0 });
+      }
+    });
+    return container[0].removeEventListener("scroll", () => {
+      if (!!menuCoord.x) {
+        setMenuCoord({ x: 0, y: 0 });
+      }
     });
   }, []);
 
@@ -45,7 +65,7 @@ const TaskList: React.FC<Props> = ({ tasks, setTasks }) => {
     try {
       await invoke("edit_task", {
         column,
-        value: value.map((v) => `${v}`.replace('"', "&#02BA;")),
+        value: value.map((v) => `${v}`),
         taskId: tasks[taskIndex].id
       });
       setTasks((prevState) =>
@@ -98,7 +118,7 @@ const TaskList: React.FC<Props> = ({ tasks, setTasks }) => {
       | React.ChangeEvent<HTMLInputElement>
   ) => {
     const { value } = e.currentTarget;
-    setInputText(value);
+    setInputText(value.replace('"', "\u02BA").replace("&OK", "\u2714"));
   };
 
   const openCommentDiv = () => {

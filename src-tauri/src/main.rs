@@ -3,6 +3,7 @@
 
 pub mod database_commands;
 
+use tauri_plugin_window_state::{AppHandleExt, StateFlags};
 use sqlite::{self, Connection};
 use std::{
     sync::Mutex,
@@ -36,7 +37,19 @@ fn open_database_connection() -> Connection {
         Err(_error) => {}
     }
 
+    let query = "
+    CREATE TABLE IF NOT EXISTS sub_tasks (id INTEGER PRIMARY KEY AUTOINCREMENT, task_id INTERGER, sub_task TEXT, completed INTERGER);
+    ";
+
+    database.execute(query).unwrap();
+
     return database;
+}
+
+#[tauri::command]
+fn close_window (app_handler: tauri::AppHandle) {
+    let _ = app_handler.save_window_state(StateFlags::all());
+    let _ = app_handler.exit(0);
 }
 
 fn main() {
@@ -49,7 +62,7 @@ fn main() {
             database_commands::get_tasks,
             database_commands::delete_task,
             database_commands::edit_task,
-            database_commands::migration
+            database_commands::migration, close_window
         ])
         .plugin(tauri_plugin_window_state::Builder::default().build())
         .run(tauri::generate_context!())

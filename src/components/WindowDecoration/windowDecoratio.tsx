@@ -5,6 +5,7 @@ import { FaRegWindowMaximize, FaRegWindowMinimize } from "react-icons/fa";
 import { IoIosClose } from "react-icons/io";
 
 import "./windowDecoration.css";
+import { invoke } from "@tauri-apps/api";
 
 const WindowDecoration: React.FC = () => {
   const minimize = () => {
@@ -16,7 +17,8 @@ const WindowDecoration: React.FC = () => {
   };
 
   const close = () => {
-    appWindow.close();
+    // appWindow.close();
+    invoke("close_window")
   };
 
   return (
