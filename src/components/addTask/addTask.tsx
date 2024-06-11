@@ -7,6 +7,8 @@ type Props = {
   setTasks: React.Dispatch<React.SetStateAction<Task[]>>;
 };
 
+type Response = Task & {sub_tasks: string} 
+
 const AddTask: React.FC<Props> = ({ setTasks }) => {
   const [isOpened, setIsOpened] = useState(false);
   const [task, setTask] = useState("");
@@ -24,10 +26,10 @@ const AddTask: React.FC<Props> = ({ setTasks }) => {
       e.preventDefault();
       if (task === "") return manageExpansion();
       try {
-        const result: Task[] = await invoke("add_task", { task: `"${task}"`, dueDate });
+        const result: Response[] = await invoke("add_task", { task: `"${task}"`, dueDate });
         if (result.length > 0) {
           setTasks((prevState) =>
-            [...prevState, result[0]]
+            [...prevState, {...result[0], sub_tasks: JSON.parse(result[0].sub_tasks)}]
               .sort((a, b) => a.due_date - b.due_date)
               .sort((a, b) =>
                 a.completed === 0 || b.completed == 0

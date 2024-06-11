@@ -9,22 +9,29 @@ import AddTask from "./components/addTask/addTask";
 import TaskList from "./components/TaskList/taskList";
 import WindowDecoration from "./components/WindowDecoration/windowDecoratio";
 
+type Response = Task & {sub_tasks: string} 
+
 function App() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [search, setSearch] = useState("");
 
   const getTasks = async () => {
     try {
-      const response: Task[] = await invoke("get_tasks", { value: Date.now() });
+      const response: Response[] = await invoke("get_tasks", { value: Date.now() });
       setTasks(
-        response.sort((a, b) =>
-          a.completed === 0 || b.completed == 0
-            ? a.completed - b.completed
-            : b.completed - a.completed
-        )
+        response
+          .sort((a, b) =>
+            a.completed === 0 || b.completed == 0
+              ? a.completed - b.completed
+              : b.completed - a.completed
+          )
+          .map((r) => ({ ...r, sub_tasks: JSON.parse(r.sub_tasks) }))
       );
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    }
   };
+
 
   useEffect(() => {
     getTasks();
@@ -44,15 +51,24 @@ function App() {
   };
 
   const cleanSearchBar = () => {
-    setSearch("")
-  }
+    setSearch("");
+  };
 
   return (
     <div className="container">
       <WindowDecoration />
       <div id="searchBar">
-        <input type="text" name="search" onChange={onSearchChange} value={search}/>
-        {search !== "" && <span onClick={cleanSearchBar}><MdCancel/></span>}
+        <input
+          type="text"
+          name="search"
+          onChange={onSearchChange}
+          value={search}
+        />
+        {search !== "" && (
+          <span onClick={cleanSearchBar}>
+            <MdCancel />
+          </span>
+        )}
       </div>
       <TaskList
         tasks={tasks.filter((value) =>

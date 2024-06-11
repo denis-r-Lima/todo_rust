@@ -9,6 +9,7 @@ pub struct DatabaseData {
     comments: String,
     completed: i64,
     due_date: i64,
+    sub_tasks: String
 }
 
 fn send_query(query: String, state: State<Database>) -> Result<Vec<DatabaseData>, ()> {
@@ -27,6 +28,7 @@ fn send_query(query: String, state: State<Database>) -> Result<Vec<DatabaseData>
                     comments: String::from(row.read::<&str, _>("comments")),
                     completed: row.read::<i64, _>("completed"),
                     due_date: row.read::<i64, _>("due_date"),
+                    sub_tasks: String::from(row.read::<&str, _>("sub_tasks"))
                 });
             }
             Ok(result)
@@ -45,7 +47,7 @@ pub fn add_task(
     state: State<Database>,
 ) -> Result<Vec<DatabaseData>, ()> {
     let query = format!(
-        "INSERT INTO tasks (task, comments, completed, due_date) VALUES ({}, '', 0, {});",
+        "INSERT INTO tasks (task, comments, completed, due_date, sub_tasks) VALUES ({}, '', 0, {}, '[]');",
         task, due_date
     );
 
@@ -92,7 +94,7 @@ pub fn edit_task(
     let mut modifications: Vec<String> = Vec::new();
 
     for n in 0..column.len() {
-        modifications.push(format!("{}=\"{}\"", column[n], value[n]));
+        modifications.push(format!("{}='{}'", column[n], value[n]));
     }
 
     let query = format!(
@@ -107,15 +109,15 @@ pub fn edit_task(
 }
 
 #[tauri::command]
-pub fn migration(value: i64, state: State<Database>) -> Result<Vec<DatabaseData>, ()> {
-    let query = format!("alter table tasks add due_date interger");
+pub fn migration(state: State<Database>) -> Result<Vec<DatabaseData>, ()> {
+    let query = format!("alter table tasks add sub_tasks text");
 
     match send_query(query, state.clone()) {
         Ok(_data) => {}
         Err(()) => return Err(()),
     }
 
-    let query = format!("update tasks set due_date = {}", value);
+    let query = format!("update tasks set sub_tasks = \"[]\"");
 
     send_query(query, state)
 }

@@ -3,6 +3,8 @@ import { invoke } from "@tauri-apps/api/tauri";
 
 import "./taskList.css";
 import MyContextMenu from "../MyContextMenu/myContextMenu";
+import Modal from "../Modal/modal";
+import EditSubTasks from "../EditSubTasks/editSubTasks";
 
 type Props = {
   tasks: Task[];
@@ -51,9 +53,7 @@ const TaskList: React.FC<Props> = ({ tasks, setTasks }) => {
   }, []);
 
   const [inputText, setInputText] = useState("");
-  const [openComment, setOpenComment] = useState(false);
-  const [openEdit, setOpenEdit] = useState(false);
-  const [openDelete, setOpenDelete] = useState(false);
+  const [whatModal, setWhatModal] = useState("");
   const [taskIndex, setTaskIndex] = useState(0);
   const [menuCoord, setMenuCoord] = useState<{ x: number; y: number }>({
     x: 0,
@@ -75,7 +75,11 @@ const TaskList: React.FC<Props> = ({ tasks, setTasks }) => {
               const temp = { ...v };
 
               for (let i = 0; i < column.length; i++) {
-                temp[column[i]] = value[i];
+                if (column[i] === "sub_tasks") {
+                  temp[column[i]] = JSON.parse(value[i] as string);
+                } else {
+                  temp[column[i]] = value[i];
+                }
               }
               return temp;
             } else {
@@ -95,8 +99,7 @@ const TaskList: React.FC<Props> = ({ tasks, setTasks }) => {
     } catch (error) {
       console.log(error);
     } finally {
-      setOpenComment(false);
-      setOpenEdit(false);
+      setWhatModal("")
     }
   };
 
@@ -106,7 +109,7 @@ const TaskList: React.FC<Props> = ({ tasks, setTasks }) => {
       setTasks((prevState) =>
         prevState.filter((value) => value.id != tasks[taskIndex].id)
       );
-      setOpenDelete(false);
+      setWhatModal("");
     } catch (error) {
       console.log(error);
     }
@@ -121,15 +124,24 @@ const TaskList: React.FC<Props> = ({ tasks, setTasks }) => {
     setInputText(value.replace('"', "\u02BA").replace("&OK", "\u2714"));
   };
 
-  const openCommentDiv = () => {
-    setInputText(tasks[taskIndex].comments);
-    setOpenComment(true);
-  };
-
-  const openEditDiv = () => {
-    setInputText(tasks[taskIndex].task);
-    setDueDate(tasks[taskIndex].due_date);
-    setOpenEdit(true);
+  const opneModal = (type: string) => {
+    const types: { [key: string]: any } = {
+      editTask: () => {
+        setInputText(tasks[taskIndex].task);
+        setDueDate(tasks[taskIndex].due_date);
+      },
+      openComment: () => {
+        setInputText(tasks[taskIndex].comments);
+      },
+      addSubTask: () => {
+        setInputText("");
+      },
+      editSubTask: () => {
+      },
+      delete: () => {}
+    };
+    setWhatModal(type)
+    types[type]();
   };
 
   const openMyContextMenu = (
@@ -149,7 +161,7 @@ const TaskList: React.FC<Props> = ({ tasks, setTasks }) => {
 
   const runMigration = async () => {
     try {
-      await invoke("migration", { value: Date.now() });
+      await invoke("migration");
     } catch (err) {
       console.log(err);
     }
@@ -168,9 +180,49 @@ const TaskList: React.FC<Props> = ({ tasks, setTasks }) => {
     e: React.MouseEvent<HTMLDivElement | HTMLButtonElement>
   ) => {
     if (e.target !== e.currentTarget) return;
-    setOpenComment(false);
-    setOpenEdit(false);
-    setOpenDelete(false);
+    setWhatModal("")
+  };
+
+  const checkSubTask = async (index: number, subIndex: number) => {
+    try {
+      await invoke("edit_task", {
+        column: ["sub_tasks"],
+        value: [
+          JSON.stringify(
+            tasks[index].sub_tasks.map((s, i) =>
+              i !== subIndex
+                ? s
+                : {
+                    subTask: s.subTask,
+                    completed: !s.completed
+                  }
+            )
+          )
+        ],
+        taskId: tasks[index].id
+      });
+      setTasks((prevState) =>
+        prevState.map((v) => {
+          if (v.id === tasks[index].id) {
+            const temp = { ...v };
+
+            temp["sub_tasks"] = v.sub_tasks.map((s, i) =>
+              i !== subIndex
+                ? s
+                : {
+                    subTask: s.subTask,
+                    completed: !!!s.completed
+                  }
+            );
+            return temp;
+          } else {
+            return v;
+          }
+        })
+      );
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -194,29 +246,55 @@ const TaskList: React.FC<Props> = ({ tasks, setTasks }) => {
                 Due Date: {correctDate(task.due_date)}
               </p>
             )}
+            {!!task.sub_tasks?.length && (
+              <ul>
+                {task.sub_tasks.map((sub, index) => (
+                  <li key={index}>
+                    <input
+                      type="checkbox"
+                      checked={sub.completed}
+                      onChange={() => checkSubTask(idx, index)}
+                    />
+                    {sub.subTask}
+                  </li>
+                ))}
+              </ul>
+            )}
             {task.comments !== "" && (
-              <p className="comments">{task.comments}</p>
+              <>
+                <p className="comments">{task.comments}</p>
+              </>
             )}
           </div>
         ))}
       </div>
-      {openComment && (
-        <div className="popUpContainer" onClick={closePopUps}>
-          <div id="commentForm">
-            <textarea
-              id="commentArea"
-              rows={10}
-              placeholder="Comment"
-              value={inputText}
-              onChange={onChange}
-            />
-            <button onClick={() => edit(["comments"], [inputText])}>
-              Confirm
-            </button>
-          </div>
-        </div>
+      {whatModal === "openComment" && (
+        <Modal
+          closePopUps={closePopUps}
+          onChange={onChange}
+          value={inputText}
+          confirm={() => edit(["comments"], [inputText])}
+        />
       )}
-      {openEdit && (
+      {whatModal === "addSubTask" && (
+        <Modal
+          closePopUps={closePopUps}
+          onChange={onChange}
+          value={inputText}
+          confirm={() =>
+            edit(
+              ["sub_tasks"],
+              [
+                JSON.stringify([
+                  ...tasks[taskIndex].sub_tasks,
+                  { subTask: inputText, completed: false }
+                ])
+              ]
+            )
+          }
+        />
+      )}
+      {whatModal === "editTask" && (
         <div className="popUpContainer" onClick={closePopUps}>
           <div id="commentForm">
             <input placeholder="Task" value={inputText} onChange={onChange} />
@@ -235,7 +313,14 @@ const TaskList: React.FC<Props> = ({ tasks, setTasks }) => {
           </div>
         </div>
       )}
-      {openDelete && (
+      {whatModal === "editSubTask" && (
+        <EditSubTasks
+          closePopUps={closePopUps}
+          value={tasks[taskIndex].sub_tasks}
+          confirm={edit}
+        />
+      )}
+      {whatModal === "delete" && (
         <div className="popUpContainer" onClick={closePopUps}>
           <div id="commentForm">
             <p>Are sure you wnat to delete this task?</p>
@@ -254,11 +339,10 @@ const TaskList: React.FC<Props> = ({ tasks, setTasks }) => {
               !!tasks[taskIndex].completed ? [0] : [Date.now()]
             )
           }
-          setOpenDelete={setOpenDelete}
-          openCommentDiv={openCommentDiv}
-          openEditDiv={openEditDiv}
+          // setOpenDelete={setOpenDelete}
           task={tasks[taskIndex]}
           runMigration={runMigration}
+          openModal={opneModal}
         />
       )}
     </>
