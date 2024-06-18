@@ -43,4 +43,20 @@ li{
     justify-content: start;
     text-align: start;
     gap: 0.6rem;
+    
+}
+
+label{
+    cursor: pointer;
+    font-size: medium;
+}
+
+input[type=checkbox]{
+    cursor: pointer;
+    accent-color: #bb1d12;
+}
+
+input[type=checkbox]:checked + label{
+    text-decoration: line-through;
+    color: #f1a9a9;
 }

@@ -99,7 +99,7 @@ const TaskList: React.FC<Props> = ({ tasks, setTasks }) => {
     } catch (error) {
       console.log(error);
     } finally {
-      setWhatModal("")
+      setWhatModal("");
     }
   };
 
@@ -136,11 +136,10 @@ const TaskList: React.FC<Props> = ({ tasks, setTasks }) => {
       addSubTask: () => {
         setInputText("");
       },
-      editSubTask: () => {
-      },
+      editSubTask: () => {},
       delete: () => {}
     };
-    setWhatModal(type)
+    setWhatModal(type);
     types[type]();
   };
 
@@ -180,7 +179,7 @@ const TaskList: React.FC<Props> = ({ tasks, setTasks }) => {
     e: React.MouseEvent<HTMLDivElement | HTMLButtonElement>
   ) => {
     if (e.target !== e.currentTarget) return;
-    setWhatModal("")
+    setWhatModal("");
   };
 
   const checkSubTask = async (index: number, subIndex: number) => {
@@ -254,13 +253,15 @@ const TaskList: React.FC<Props> = ({ tasks, setTasks }) => {
                       type="checkbox"
                       checked={sub.completed}
                       onChange={() => checkSubTask(idx, index)}
+                      id={`${idx} - ${index}`}
+                      disabled={!!task.completed}
                     />
-                    {sub.subTask}
+                    <label htmlFor={`${idx} - ${index}`}>{sub.subTask}</label>
                   </li>
                 ))}
               </ul>
             )}
-            {task.comments !== "" && (
+            {task.comments !== "" && !!!task.completed && (
               <>
                 <p className="comments">{task.comments}</p>
               </>
@@ -339,7 +340,6 @@ const TaskList: React.FC<Props> = ({ tasks, setTasks }) => {
               !!tasks[taskIndex].completed ? [0] : [Date.now()]
             )
           }
-          // setOpenDelete={setOpenDelete}
           task={tasks[taskIndex]}
           runMigration={runMigration}
           openModal={opneModal}

@@ -9,7 +9,7 @@ import AddTask from "./components/addTask/addTask";
 import TaskList from "./components/TaskList/taskList";
 import WindowDecoration from "./components/WindowDecoration/windowDecoratio";
 
-type Response = Task & {sub_tasks: string} 
+type Response = Task & { sub_tasks: string };
 
 function App() {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -17,7 +17,9 @@ function App() {
 
   const getTasks = async () => {
     try {
-      const response: Response[] = await invoke("get_tasks", { value: Date.now() });
+      const response: Response[] = await invoke("get_tasks", {
+        value: Date.now()
+      });
       setTasks(
         response
           .sort((a, b) =>
@@ -32,18 +34,29 @@ function App() {
     }
   };
 
-
   useEffect(() => {
     getTasks();
   }, []);
 
   const isDev = () => {
-    return window.location.host.startsWith("localhost:");
+    // return window.location.host.startsWith("localhost:");
+    return false;
   };
 
   useEffect(() => {
-    if (!isDev()) addEventListener("contextmenu", (e) => e.preventDefault());
-    return removeEventListener("contextmenu", (e) => e.preventDefault());
+    if (!isDev())
+      addEventListener("contextmenu", (e) => {
+        const target = e.target as HTMLInputElement;
+        if (target.type === "date") e.preventDefault()
+        if (target.tagName !== "INPUT" && target.tagName !== "TEXTAREA")
+          e.preventDefault();
+      });
+    return removeEventListener("contextmenu", (e: MouseEvent) => {
+      const target = e.target as HTMLInputElement;
+        if (target.type === "date") e.preventDefault()
+        if (target.tagName !== "INPUT" && target.tagName !== "TEXTAREA")
+          e.preventDefault();
+    });
   }, []);
 
   const onSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {

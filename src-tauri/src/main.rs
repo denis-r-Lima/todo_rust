@@ -23,19 +23,19 @@ fn open_database_connection() -> Connection {
 
     database.execute(query).unwrap();
 
-    match SystemTime::now().duration_since(UNIX_EPOCH) {
-        Ok(n) => {
-            let query = format!(
-                "delete from tasks where completed != 0 and completed < {}",
-                n.as_millis() - (2678000 * 1000)
-            );
-            match database.execute(query) {
-                Ok(()) => {}
-                Err(error) => println!("{:?}", error),
-            }
-        }
-        Err(_error) => {}
-    }
+    // match SystemTime::now().duration_since(UNIX_EPOCH) {
+    //     Ok(n) => {
+    //         let query = format!(
+    //             "delete from tasks where completed != 0 and completed < {}",
+    //             n.as_millis() - (2678000 * 1000)
+    //         );
+    //         match database.execute(query) {
+    //             Ok(()) => {}
+    //             Err(error) => println!("{:?}", error),
+    //         }
+    //     }
+    //     Err(_error) => {}
+    // }
 
     return database;
 }
