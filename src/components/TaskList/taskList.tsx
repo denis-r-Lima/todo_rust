@@ -122,6 +122,7 @@ const TaskList: React.FC<Props> = ({ tasks, setTasks }) => {
   ) => {
     const { value } = e.currentTarget;
     setInputText(value.replace('"', "\u02BA").replace("&OK", "\u2714"));
+    console.log(inputText)
   };
 
   const opneModal = (type: string) => {
@@ -245,7 +246,7 @@ const TaskList: React.FC<Props> = ({ tasks, setTasks }) => {
                 Due Date: {correctDate(task.due_date)}
               </p>
             )}
-            {!!task.sub_tasks?.length && (
+            {!!task.sub_tasks?.length && !!!task.completed && (
               <ul>
                 {task.sub_tasks.map((sub, index) => (
                   <li key={index}>

@@ -1,13 +1,17 @@
 import React from "react";
 import { appWindow } from "@tauri-apps/api/window";
 import { FaRegWindowMaximize, FaRegWindowMinimize } from "react-icons/fa";
-// import { FaGear } from "react-icons/fa6";
+import { FaGear } from "react-icons/fa6";
 import { IoIosClose } from "react-icons/io";
 
 import "./windowDecoration.css";
 import { invoke } from "@tauri-apps/api";
 
-const WindowDecoration: React.FC = () => {
+type Props = {
+  setConfig: React.Dispatch<React.SetStateAction<boolean>>
+}
+
+const WindowDecoration: React.FC<Props> = ({setConfig}) => {
   const minimize = () => {
     appWindow.minimize();
   };
@@ -23,9 +27,9 @@ const WindowDecoration: React.FC = () => {
 
   return (
     <div data-tauri-drag-region className="titlebar">
-        {/* <div className="titlebar-button left">
-          <FaGear />
-        </div> */}
+        <div className="titlebar-button left">
+          <FaGear onClick={()=> setConfig(prevState => !prevState)}/>
+        </div>
 
       <div className="titlebar-button" onClick={minimize}>
         <FaRegWindowMinimize />

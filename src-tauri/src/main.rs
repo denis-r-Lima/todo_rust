@@ -6,7 +6,7 @@ pub mod database_commands;
 use sqlite::{self, Connection};
 use std::{
     sync::Mutex,
-    time::{SystemTime, UNIX_EPOCH},
+    // time::{SystemTime, UNIX_EPOCH},
 };
 use tauri_plugin_window_state::{AppHandleExt, StateFlags};
 
@@ -20,6 +20,10 @@ fn open_database_connection() -> Connection {
     let query = "
     CREATE TABLE IF NOT EXISTS tasks (id INTEGER PRIMARY KEY AUTOINCREMENT, task TEXT, comments TEXT, due_date INTERGER, completed INTERGER, sub_tasks TEXT);
     ";
+
+    database.execute(query).unwrap();
+
+    let query = "CREATE TABLE IF NOT EXISTS sub_tasks_templates (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, sub_tasks TEXT);";
 
     database.execute(query).unwrap();
 
@@ -56,6 +60,8 @@ fn main() {
             database_commands::get_tasks,
             database_commands::delete_task,
             database_commands::edit_task,
+            database_commands::add_sub_task_template,
+            database_commands::get_all_templates,
             database_commands::migration,
             close_window
         ])

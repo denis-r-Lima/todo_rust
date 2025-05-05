@@ -1,0 +1,30 @@
+.configContainer {
+  position: absolute;
+  top: 30px;
+  left: 0;
+  background-color: black;
+  height: calc(100vh - 30px);
+  width: 100vw;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.configOption{
+  text-align: center;
+  width: 85%;
+  padding: 0.8rem 1rem;
+  margin: 0.2rem;
+  border-radius: 0.5rem;
+  font-size: large;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  align-items: center;
+  &:hover{
+      background-color: rgba(200,200,200,0.15);
+  }
+}

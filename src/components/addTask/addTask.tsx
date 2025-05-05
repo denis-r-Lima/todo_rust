@@ -22,11 +22,10 @@ const AddTask: React.FC<Props> = ({ setTasks }) => {
   };
 
   const submit = async (e: React.FormEvent<HTMLFormElement>) => {
-
       e.preventDefault();
       if (task === "") return manageExpansion();
       try {
-        const result: Response[] = await invoke("add_task", { task: `"${task}"`, dueDate });
+        const result: Response[] = await invoke("add_task", { task: task, dueDate });
         if (result.length > 0) {
           setTasks((prevState) =>
             [...prevState, {...result[0], sub_tasks: JSON.parse(result[0].sub_tasks)}]

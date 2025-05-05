@@ -14,16 +14,14 @@ type Props = {
   left: number;
   completeTask: () => void;
   runMigration: () => void;
-  // setOpenDelete: (value: React.SetStateAction<boolean>) => void;
   task: Task;
-  openModal: (type: string) => void
+  openModal: (type: string) => void;
 };
 
 const MyContextMenu: React.FC<Props> = ({
   top,
   left,
   completeTask,
-  // setOpenDelete,
   // runMigration,
   task,
   openModal
@@ -44,7 +42,7 @@ const MyContextMenu: React.FC<Props> = ({
         <MdFormatListBulleted size={16} />
         Add Sub-Task
       </div>
-      <div className="menuItem" onClick={() =>  openModal("openComment")}>
+      <div className="menuItem" onClick={() => openModal("openComment")}>
         <MdModeComment />
         {task.comments === "" ? "Add" : "Edit"} Comment
       </div>
@@ -52,10 +50,12 @@ const MyContextMenu: React.FC<Props> = ({
         <MdEdit size={16} />
         Edit Task
       </div>
-      <div className="menuItem" onClick={() => openModal("editSubTask")}>
-        <MdEdit size={16} />
-        Edit Sub-Task
-      </div>
+      {!!task.sub_tasks.length && (
+        <div className="menuItem" onClick={() => openModal("editSubTask")}>
+          <MdEdit size={16} />
+          Edit Sub-Task
+        </div>
+      )}
       <div className="menuItem" onClick={() => openModal("delete")}>
         <MdDeleteForever size={16} />
         Delete Task
